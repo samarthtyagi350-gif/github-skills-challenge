@@ -10,7 +10,6 @@ class AnomalyDetector:
         self.response_time_threshold = response_time_threshold
         self.cpu_threshold = cpu_threshold
         self.memory_threshold = memory_threshold
-        
 
     def detect(self, record):
         reasons = []
