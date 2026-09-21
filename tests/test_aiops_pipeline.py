@@ -7,6 +7,7 @@ from src.event_producer import EventProducer
 from src.event_topic import EventTopic
 
 
+
 def test_normal_record_is_not_anomaly():
     detector = AnomalyDetector()
 

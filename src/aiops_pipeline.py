@@ -1,28 +1,34 @@
 import json
+from pathlib import Path
 
-from anomaly_detector import AnomalyDetector
-from event_consumer import EventConsumer
-from event_producer import EventProducer
-from event_topic import EventTopic
+try:
+    from .anomaly_detector import AnomalyDetector
+    from .event_consumer import EventConsumer
+    from .event_producer import EventProducer
+    from .event_topic import EventTopic
+except ImportError:  # pragma: no cover - allows direct script execution
+    from anomaly_detector import AnomalyDetector
+    from event_consumer import EventConsumer
+    from event_producer import EventProducer
+    from event_topic import EventTopic
 
 
 def load_data(file_path):
-    with open(file_path, "r", encoding="utf-8") as file:
+    path = Path(file_path)
+    if not path.is_absolute():
+        path = Path(__file__).resolve().parent.parent / path
+    with path.open("r", encoding="utf-8") as file:
         return json.load(file)
 
 
 def run_pipeline(file_path):
     data = load_data(file_path)
 
-    # INTENTIONAL ASSESSMENT ISSUE #2
     anomaly_topic = EventTopic("anomaly-events")
 
     detector = AnomalyDetector()
     producer = EventProducer(anomaly_topic)
-
-    # INTENTIONAL ASSESSMENT ISSUE #3
-    consumer_topic = anomaly_topic
-    consumer = EventConsumer(consumer_topic)
+    consumer = EventConsumer(anomaly_topic)
 
     detected_events = []
 
@@ -43,7 +49,8 @@ def run_pipeline(file_path):
 
 
 if __name__ == "__main__":
-    result = run_pipeline("data/service_data.json")
+    project_root = Path(__file__).resolve().parent.parent
+    result = run_pipeline(project_root / "data" / "service_data.json")
 
     print("=" * 50)
     print("AIOps Pipeline Result")
